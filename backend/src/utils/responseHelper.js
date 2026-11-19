@@ -98,6 +98,38 @@ export const sendNoContent = (res) => {
   return res.status(204).send();
 };
 
+/**
+ * Send a paginated success response
+ * Wraps list data with pagination metadata for consistent API responses
+ * @param {Object} res - Express response object
+ * @param {Array} data - Array of records for the current page
+ * @param {number} total - Total number of records across all pages
+ * @param {number} page - Current page number (1-based)
+ * @param {number} limit - Number of records per page
+ * @param {string} message - Optional success message
+ */
+export const sendPaginated = (res, data, total, page, limit, message = null) => {
+  const totalPages = Math.ceil(total / limit);
+  const response = {
+    success: true,
+    data,
+    pagination: {
+      total,
+      page,
+      limit,
+      totalPages,
+      hasNextPage: page < totalPages,
+      hasPrevPage: page > 1,
+    },
+  };
+
+  if (message) {
+    response.message = message;
+  }
+
+  return res.status(200).json(response);
+};
+
 export default {
   sendSuccess,
   sendError,
@@ -107,4 +139,5 @@ export default {
   sendForbidden,
   sendCreated,
   sendNoContent,
+  sendPaginated,
 };
